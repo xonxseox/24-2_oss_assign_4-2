@@ -1,0 +1,74 @@
+{
+  "fruits": [
+    {
+      "id": "2",
+      "name": "Banana",
+      "color": "Yellow",
+      "pricePerKg": 1.2,
+      "origin": "Ecuador"
+    },
+    {
+      "id": "3",
+      "name": "Cherry",
+      "color": "Red",
+      "pricePerKg": 10,
+      "origin": "Turkey"
+    },
+    {
+      "id": "4",
+      "name": "Date",
+      "color": "Brown",
+      "pricePerKg": 6,
+      "origin": "Saudi Arabia"
+    },
+    {
+      "id": "5",
+      "name": "Grape",
+      "color": "Green",
+      "pricePerKg": 4.2,
+      "origin": "Italy"
+    },
+    {
+      "id": "6",
+      "name": "Kiwi",
+      "color": "Brown",
+      "pricePerKg": 5.5,
+      "origin": "New Zealand"
+    },
+    {
+      "id": "7",
+      "name": "Lemon",
+      "color": "Yellow",
+      "pricePerKg": 2.3,
+      "origin": "Mexico"
+    },
+    {
+      "id": "8",
+      "name": "Mango",
+      "color": "Orange",
+      "pricePerKg": 7.8,
+      "origin": "India"
+    },
+    {
+      "id": "9",
+      "name": "Orange",
+      "color": "Orange",
+      "pricePerKg": 3,
+      "origin": "Spain"
+    },
+    {
+      "id": "10",
+      "name": "Strawberry",
+      "color": "Red",
+      "pricePerKg": 8.5,
+      "origin": "USA"
+    },
+    {
+      "name": "두리안",
+      "color": "황색",
+      "pricePerKg": "70000",
+      "origin": "태국",
+      "id": "8a5e"
+    }
+  ]
+}

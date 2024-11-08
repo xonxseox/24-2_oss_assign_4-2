@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4="
+    crossorigin="anonymous"></script>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <title>과일 관리</title>
+
+  <style>
+    /* 화면을 세로, 가로로 중앙에 정렬 */
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      text-align: center;
+      margin: 0;
+      background-color: #f8f9fa;
+    }
+
+    .container {
+      max-width: 600px;
+      padding: 20px;
+      border-radius: 10px;
+      background-color: white;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+      margin-bottom: 20px;
+      font-size: 2rem;
+    }
+
+    .btn {
+      margin: 10px;
+    }
+
+    #div_fruits {
+      margin-top: 20px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h1>과일 관리 시스템</h1>
+    <button class="btn btn-primary" onclick="getDataFromJSONFile()">과일 목록 보기</button>
+    <div>
+      <button class="btn btn-primary" onclick="openAddModal()">과일 추가</button>
+      <button class="btn btn-secondary" onclick="openUpdateModal()">과일 수정</button>
+      <button class="btn btn-danger" onclick="openDeleteModal()">과일 삭제</button>
+    </div>
+    <div id="div_fruits">
+      <!-- 과일 목록이 여기에 표시됩니다. -->
+    </div>
+  </div>
+
+  <!-- 데이터 추가 및 수정용 모달 -->
+  <div class="modal fade" id="fruitModal" tabindex="-1" aria-labelledby="fruitModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="fruitModalLabel">과일 추가/수정</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          이름: <input type="text" id="fruit_name" class="form-control" placeholder="과일 이름 입력" />
+          색상: <input type="text" id="fruit_color" class="form-control" placeholder="색상 입력" />
+          가격(kg당): <input type="number" id="fruit_price" class="form-control" placeholder="가격 입력" />
+          원산지: <input type="text" id="fruit_origin" class="form-control" placeholder="원산지 입력" />
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+          <button type="button" class="btn btn-primary" onclick="createDataToJSONFile()">과일 추가</button>
+          <button type="button" class="btn btn-primary" onclick="updateDataToJSONFile()">과일 수정</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 삭제용 모달 -->
+  <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="deleteModalLabel">과일 삭제</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          삭제할 과일의 ID를 입력하세요: 
+          <input type="text" id="delete_fruit_id" class="form-control" placeholder="과일 ID 입력" />
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+          <button type="button" class="btn btn-danger" onclick="deleteDataFromJSONFile()">과일 삭제</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    const apiBaseUrl = "https://672e398e229a881691ef646a.mockapi.io/Fruits"; // MockAPI URL
+
+    function getDataFromJSONFile() {
+      const xhr = new XMLHttpRequest();
+      xhr.open("GET", apiBaseUrl);
+      xhr.setRequestHeader("Content-Type", "application/json");
+      xhr.send();
+      xhr.onload = () => {
+        if (xhr.status === 200) {
+          $("#div_fruits").html("");
+          let fruits = JSON.parse(xhr.response);
+          fruits.forEach((item) => {
+            $("#div_fruits").append(`<div>ID: ${item.id}, 이름: ${item.name}, 색상: ${item.color}, 가격: ${item.pricePerKg}원, 원산지: ${item.origin}</div>`);
+          });
+        }
+      };
+    }
+
+    // 데이터 추가 모달 열기
+    function openAddModal() {
+      $("#fruit_name").val("");
+      $("#fruit_color").val("");
+      $("#fruit_price").val("");
+      $("#fruit_origin").val("");
+      $(".modal-footer .btn-primary").text("과일 추가").attr("onclick", "createDataToJSONFile()");
+      $('#fruitModal').modal('show');
+    }
+
+    // 데이터 수정 모달 열기
+    function openUpdateModal() {
+      let id = prompt("수정할 과일의 ID를 입력하세요:");
+      if (!id) return;
+      
+      const xhr = new XMLHttpRequest();
+      xhr.open("GET", `${apiBaseUrl}/${id}`);
+      xhr.setRequestHeader("Content-Type", "application/json");
+      xhr.send();
+      xhr.onload = () => {
+        if (xhr.status === 200) {
+          let fruit = JSON.parse(xhr.response);
+          $("#fruit_name").val(fruit.name);
+          $("#fruit_color").val(fruit.color);
+          $("#fruit_price").val(fruit.pricePerKg);
+          $("#fruit_origin").val(fruit.origin);
+          $(".modal-footer .btn-primary").text("과일 수정").attr("onclick", `updateDataToJSONFile(${id})`);
+          $('#fruitModal').modal('show');
+        }
+      };
+    }
+
+    // 삭제 모달 열기
+    function openDeleteModal() {
+      $('#deleteModal').modal('show');
+    }
+
+    // 과일 추가
+    function createDataToJSONFile() {
+      const xhr = new XMLHttpRequest();
+      xhr.open("POST", apiBaseUrl);
+      xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+
+      let data = {
+        name: $("#fruit_name").val(),
+        color: $("#fruit_color").val(),
+        pricePerKg: $("#fruit_price").val(),
+        origin: $("#fruit_origin").val()
+      };
+
+      xhr.send(JSON.stringify(data));
+      xhr.onload = () => {
+        if (xhr.status === 201) {
+          alert("과일이 추가되었습니다!");
+          $('#fruitModal').modal('hide');
+          getDataFromJSONFile();
+        }
+      };
+    }
+
+    // 과일 수정
+    function updateDataToJSONFile(id) {
+      const xhr = new XMLHttpRequest();
+      xhr.open("PUT", `${apiBaseUrl}/${id}`);
+      xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+
+      let data = {
+        name: $("#fruit_name").val(),
+        color: $("#fruit_color").val(),
+        pricePerKg: $("#fruit_price").val(),
+        origin: $("#fruit_origin").val()
+      };
+
+      xhr.send(JSON.stringify(data));
+      xhr.onload = () => {
+        if (xhr.status === 200) {
+          alert("과일 정보가 수정되었습니다!");
+          $('#fruitModal').modal('hide');
+          getDataFromJSONFile();
+        }
+      };
+    }
+
+    // 과일 삭제
+    function deleteDataFromJSONFile() {
+      let id = $("#delete_fruit_id").val();
+      if (!id) {
+        alert("삭제할 과일 ID를 입력하세요!");
+        return;
+      }
+
+      const xhr = new XMLHttpRequest();
+      xhr.open("DELETE", `${apiBaseUrl}/${id}`);
+      xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+      xhr.send();
+
+      xhr.onload = () => {
+        if (xhr.status === 200) {
+          alert("과일이 삭제되었습니다!");
+          $('#deleteModal').modal('hide');
+          getDataFromJSONFile();
+        } else {
+          alert("삭제 실패! 오류 발생.");
+        }
+      };
+    }
+  </script>
+</body>
+
+</html>
